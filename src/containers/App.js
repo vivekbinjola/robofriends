@@ -1,49 +1,40 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll'
 import './App.css'
 import Errorboundary from '../components/Errorboundary';
  
+function  App(){
+ const[robots, setrobots]= useState([])
+ const[searchfield, setSearchfield]= useState('')
+ const[count,setCount]= useState(0)
 
+ useEffect(()=>{
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then(response => response.json())
+    .then(users=>{ setrobots(users)});
+    console.log(count)
+   
+},[count]) //only run if count changes.
 
-class App extends Component {
-    constructor() {
-        super()
-        this.state = {
-
-            robots: [],
-            searchfield: ''
-        }
-
+    const onSearchChange = (event) => {
+        setSearchfield( event.target.value)
     }
 
-
-    onSearchChange = (event) => {
-        this.setState({ searchfield: event.target.value })
-    }
-
-    componentDidMount() {
-     fetch('https://jsonplaceholder.typicode.com/users')
-     .then(response => response.json())
-     .then(users=>{this.setState({robots:users})});
-    }
-
-
-    render() {
-        const filteredRobots = this.state.robots.filter(robots => {
-            return robots.name.toLowerCase().includes(this.state.searchfield.toLowerCase());
+  const filteredRobots = robots.filter(robot => {
+            return robot.name.toLowerCase().includes(searchfield.toLowerCase());
         })
 
-        if(this.state.robots.length === 0)
-        {
-           return <h1>Loading..</h1>
-        }
-        else {
-            return (
-                <div className='tc'>
+    return !robots.length?
+    <h1>Loading..</h1>:
+
+           (
+                  <div className='tc'>
                     <h1 className='f1'>RoboFriends</h1>
-                    <SearchBox SearchChange={this.onSearchChange} />
+                    <button onClick={()=>setCount(count+1)}>Click</button>
+                    
+                    <SearchBox SearchChange={ onSearchChange} />
                     <Scroll>
                     <Errorboundary>
                    < CardList robots={filteredRobots} />
@@ -51,11 +42,9 @@ class App extends Component {
                    </Scroll> 
                 </div>
             );
-        }
-
-      
-    }
-}
+        }  
+    
+ 
 
 
 export default App; 
